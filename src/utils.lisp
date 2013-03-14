@@ -1,6 +1,9 @@
 
 (in-package :cl-tptp)
 
+(defun stringify (x)
+  (format nil "~a" x))
+
 (defgeneric symbolify-here (thing))
 
 (defmethod symbolify-here ((thing symbol))
