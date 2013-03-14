@@ -121,16 +121,16 @@
 
 	   ((digit-char-p c)
 	    (unread-char c stream)
-	    (return-from lexer (values (intern "integer" :tipi)
+	    (return-from lexer (values (intern "integer" :cl-tptp)
 				       (read-integer stream))))
 
 	   ((char= c #\')
 	    (unread-char c stream)
 	    (let ((quoted (read-quoted-atom stream)))
-	      (return-from lexer (values (intern "single-quoted" :tipi) quoted))))
+	      (return-from lexer (values (intern "single-quoted" :cl-tptp) quoted))))
 
 	   ((char= c #\$)
-	    (return-from lexer (values (intern "$" :tipi) "$")))
+	    (return-from lexer (values (intern "$" :cl-tptp) "$")))
 
 	   ((member c '(#\( #\) #\. #\[ #\] #\: #\! #\? #\, #\< #\~ #\= #\&))
 	    ;; (break "Got a symbol: ~a" c)
@@ -139,7 +139,7 @@
 
 	    (when (char= c #\,)
 	     (incf num-commas-read)
-	     (return-from lexer (values (intern "," :tipi) ",")))
+	     (return-from lexer (values (intern "," :cl-tptp) ",")))
 
 	    (when (char= c #\~)
 	      (let ((after-~ (read-char stream nil nil)))
@@ -147,12 +147,12 @@
 		       (lexer-error #\~))
 		      ((member after-~ *whitespace-characters*)
 		       (unread-char after-~ stream)
-		       (return-from lexer (values (intern "~" :tipi) "~")))
+		       (return-from lexer (values (intern "~" :cl-tptp) "~")))
 		      ((char= after-~ #\&)
-		       (return-from lexer (values (intern "~&" :tipi) "~&")))
+		       (return-from lexer (values (intern "~&" :cl-tptp) "~&")))
 		      (t
 		       (unread-char after-~ stream)
-		       (return-from lexer (values (intern "~" :tipi) "~"))))))
+		       (return-from lexer (values (intern "~" :cl-tptp) "~"))))))
 
 	    (when (char= c #\!)
 	      (let ((after-! (read-char stream nil nil)))
@@ -160,12 +160,12 @@
 		       (lexer-error #\!))
 		      ((member after-! *whitespace-characters*)
 		       (unread-char after-! stream)
-		       (return-from lexer (values (intern "!" :tipi) "!")))
+		       (return-from lexer (values (intern "!" :cl-tptp) "!")))
 		      ((char= after-! #\=)
-		       (return-from lexer (values (intern "!=" :tipi) "!=")))
+		       (return-from lexer (values (intern "!=" :cl-tptp) "!=")))
 		      (t
 		       (unread-char after-! stream)
-		       (return-from lexer (values (intern "!" :tipi) "!"))))))
+		       (return-from lexer (values (intern "!" :cl-tptp) "!"))))))
 
 	    (when (char= c #\<)
 	      (let ((after-< (read-char stream nil nil)))
@@ -178,9 +178,9 @@
 			 (cond ((null after-after-<)
 				(lexer-error after-<))
 			       ((char= after-after-< #\>)
-				(return-from lexer (values (intern "<=>" :tipi) "<=>")))
+				(return-from lexer (values (intern "<=>" :cl-tptp) "<=>")))
 			       (t
-				(return-from lexer (values (intern "<=" :tipi) "<="))))))
+				(return-from lexer (values (intern "<=" :cl-tptp) "<="))))))
 		      (t
 		       (lexer-error #\<)))))
 
@@ -188,16 +188,16 @@
 	      (let ((d (read-char stream nil nil)))
 		(if d
 		    (if (char= d #\>)
-			(return-from lexer (values (intern "=>" :tipi) "=>"))
+			(return-from lexer (values (intern "=>" :cl-tptp) "=>"))
 			(progn
 			    (unread-char d stream)
-			    (return-from lexer (values (intern "=" :tipi) "="))))
+			    (return-from lexer (values (intern "=" :cl-tptp) "="))))
 		    (lexer-error d))))
 
-	    (return-from lexer (values (intern (string c) :tipi) (string c))))
+	    (return-from lexer (values (intern (string c) :cl-tptp) (string c))))
 
 	   ((char= c #\|)
-	    (return-from lexer (values (intern "|" :tipi) "|")))
+	    (return-from lexer (values (intern "|" :cl-tptp) "|")))
 
 	   ;; try to read an atom
 
@@ -209,7 +209,7 @@
 		    (when (string= next-word "include")
 		      (setf within-include t))
 		    (setf toplevel-p nil)
-		    (return-from lexer (values (intern next-word :tipi) next-word)))
+		    (return-from lexer (values (intern next-word :cl-tptp) next-word)))
 		  (error "Don't know how to handle the toplevel word '~a'." next-word))))
 
 	   ((and (= num-commas-read 1)
@@ -218,7 +218,7 @@
 	    (let ((next-word (read-word stream)))
 	      (if (member next-word *formula-roles* :test #'string=)
 		  (progn
-		    (return-from lexer (values (intern next-word :tipi) next-word)))
+		    (return-from lexer (values (intern next-word :cl-tptp) next-word)))
 		  (error "Unknown formula role '~a'." next-word))))
 
 	   ((alpha-char-p c)
@@ -226,9 +226,9 @@
 	    (let ((next-word (read-word stream)))
 	      ;; (break "next-word = ~a" next-word)
 	      (cond ((lower-case-p c)
-		     (return-from lexer (values (intern "lower-word" :tipi) next-word)))
+		     (return-from lexer (values (intern "lower-word" :cl-tptp) next-word)))
 		    ((upper-case-p c)
-		     (return-from lexer (values (intern "upper-word" :tipi) next-word)))
+		     (return-from lexer (values (intern "upper-word" :cl-tptp) next-word)))
 		    (t
 		     (error "Don't know how to handle '~a'." next-word)))))
 
@@ -236,13 +236,6 @@
 	    (lexer-error c))))))
 
 ;;; The parser and semantic actions
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun k-2-3 (a b c)
-    "Second out of three."
-    (declare (ignore a c))
-    b)
-  )
 
 (define-parser *tptp-v5.4.0.0-parser*
   (:start-symbol tptp-file)
@@ -550,7 +543,7 @@
 		#'(lambda (word left-paren terms right-paren)
 		    (declare (ignore left-paren right-paren))
 		    (make-instance 'atomic-expression
-				   :head (intern word :tipi)
+				   :head (intern word :cl-tptp)
 				   :arguments terms))))
 
   (name
@@ -728,7 +721,7 @@
 		(unless (string= (format nil "~a" pred) "=")
 		  (error "Unknown infix predicate '~a'." pred))
 		(make-instance 'equation
-			       :predicate (intern "=" :tipi)
+			       :predicate (intern "=" :cl-tptp)
 			       :arguments (list left right)
 			       :lhs left
 			       :rhs right))))
@@ -739,7 +732,7 @@
   (infix-equality
    (|=| #'(lambda (x)
 	    (declare (ignore x))
-	    (intern "=" :tipi))))
+	    (intern "=" :cl-tptp))))
 
   (defined-plain-formula
       defined-prop
@@ -777,7 +770,7 @@
   (variable
    (|upper-word| #'(lambda (x)
 		     (make-instance 'variable-term
-				    :head (intern x :tipi)))))
+				    :head (intern x :cl-tptp)))))
 
   (fof-unary-formula
    (unary-connective fof-unitary-formula
@@ -822,13 +815,13 @@
    (constant
     #'(lambda (c)
 	(make-instance 'atomic-expression
-		       :head (intern c :tipi)
+		       :head (intern c :cl-tptp)
 		       :arguments nil)))
    (functor |(| arguments |)|
 	    #'(lambda (f lparen args rparen)
 		(declare (ignore lparen rparen))
 		(make-instance 'function-term
-			       :head (intern f :tipi)
+			       :head (intern f :cl-tptp)
 			       :arguments args))))
 
   (constant
@@ -911,5 +904,46 @@
        for token = (lexer stream)
        collect token into tokens
        unless token return tokens)))
+
+(defgeneric parse-released-tptp (problem &key tptp-directory)
+  (:documentation "Parse PROBLEM, considered as a released TPTP problem."))
+
+(defmethod parse-released-tptp ((problem symbol) &key tptp-directory)
+  (parse-released-tptp (symbol-name problem) :tptp-directory tptp-directory))
+
+(defmethod parse-released-tptp :before ((problem string) &key tptp-directory)
+  (declare (ignore tptp-directory))
+  (when (string= problem "")
+    (error "The empty string is not the name of a TPTP problem."))
+  (when (or (length= problem 1)
+	    (length= problem 2)
+	    (length= problem 3))
+    (error "Names of TPTP problems must have at least 4 characters;~%~%  ~a~%~%is too short." problem)))
+
+(defmethod parse-released-tptp ((problem string) &key tptp-directory)
+  (unless tptp-directory
+    (setf tptp-directory (getenv "TPTP")))
+  (when (null tptp-directory)
+    (error "No TPTP-DIRECTORY supplied, and the TPTP environment variable appears to be unset."))
+  (when (stringp tptp-directory)
+    (setf tptp-directory (pathname tptp-directory)))
+  (setf tptp-directory (pathname-as-directory tptp-directory))
+  (unless (directory-exists-p tptp-directory)
+    (error "No such directory '~a'." (namestring tptp-directory)))
+  (let ((problems-subdir (merge-pathnames "Problems/" tptp-directory)))
+    (unless (directory-exists-p problems-subdir)
+      (error "The 'Problems' subdirectory of the TPTP directory~%~%  ~a~%~%does not exist." (namestring tptp-directory)))
+    (let ((first-three (subseq problem 0 3)))
+      (let ((subsection-subdir (merge-pathnames (format nil "~a/" first-three)
+						problems-subdir)))
+	(unless (directory-exists-p subsection-subdir)
+	  (error "No such problem section '~a' under~%~%  ~a~%" first-three (namestring problems-subdir)))
+	(let ((tptp-path (merge-pathnames (format nil "~a.p" problem)
+					  subsection-subdir)))
+	  (unless (file-exists-p tptp-path)
+	    (error "The TPTP file for~%~%  ~a~%~%could not be found at the expected location~%~%  ~a~%" problem (namestring tptp-path)))
+	  (parse-tptp tptp-path))))))
+
+
 
 ;;; parse.lisp ends here

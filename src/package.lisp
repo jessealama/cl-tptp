@@ -6,4 +6,10 @@
   (:use #:cl)
   (:use #:yacc)
   (:import-from #:named-readtables
-		#:in-readtable))
+		#:in-readtable)
+  (:import-from #:cl-fad
+		#:pathname-as-directory
+		#:directory-exists-p
+		#:file-exists-p)
+  (:import-from #:alexandria
+		#:length=))
