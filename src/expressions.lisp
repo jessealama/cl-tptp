@@ -766,4 +766,4 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 (defmethod contains-predicate? ((gen generalization) predicate)
   (contains-predicate? (matrix gen) predicate))
 
-;;; formulas.lisp ends here
+;;; expressions.lisp ends here
