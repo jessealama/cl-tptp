@@ -148,30 +148,6 @@
 (defmethod formula-with-name ((tptp-path pathname) name)
   (formula-with-name (parse-tptp tptp-path) name))
 
-(defgeneric premises (problem))
-
-(defmethod premises ((db tptp-db))
-  (non-conjecture-formulas db))
-
-(defgeneric restrict-to (db formulas)
-  (:documentation "Restrict DB to the formulas in FORMULAS."))
-
-(defmethod restrict-to ((db tptp-db) (formulas list))
-  (let ((new-formulas nil))
-    (dolist (formula formulas)
-      (cond ((stringp formula)
-	     (let ((formula-in-db (formula-with-name db formula)))
-	       (when formula-in-db
-		 (push formula-in-db new-formulas))))
-	    ((typep formula 'formula)
-	     (let ((formula-in-db (formula-with-name db (name formula))))
-	       (when formula-in-db
-		 (push formula-in-db new-formulas))))
-	    (t
-	     (error "Don't know how to handle ~a." formula))))
-    (make-instance 'tptp-db
-		   :formulas new-formulas)))
-
 (defmethod fofify ((db tptp-db))
   (make-instance 'tptp-db
 		 :path (path db)
@@ -261,48 +237,6 @@
 		 :name (name formula)
 		 :role (role formula)
 		 :formula (fofify (formula formula))))
-
-(defgeneric premises (thing))
-
-(defmethod premises ((x null))
-  nil)
-
-(defmethod premises ((x inference-record))
-  (premises (parents x)))
-
-(defmethod premises ((x null))
-  nil)
-
-(defmethod premises ((x general-list))
-  (reduce #'append (mapcar #'premises (terms x))))
-
-(defmethod premises ((x list))
-  (reduce #'append (mapcar #'premises x)))
-
-(defmethod premises ((x integer))
-  (list x))
-
-(defmethod premises ((x string))
-  (list x))
-
-(defmethod premises ((x tptp-formula))
-  (when (slot-boundp x 'source)
-    (premises (source x))))
-
-(defmethod premises ((x atomic-expression))
-  nil)
-
-(defun replace-premises (formula new-premises)
-  (setf (source formula)
-	(make-instance 'atomic-expression
-		       :head (intern "inference" :cl-tptp)
-		       :arguments (list (make-instance 'atomic-expression
-						       :head (intern "unknown" :cl-tptp)
-						       :arguments nil)
-					(make-instance 'general-list)
-					(make-instance 'general-list
-						       :terms new-premises))))
-  formula)
 
 (defgeneric find-formula (formulas name))
 
