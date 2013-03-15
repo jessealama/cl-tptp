@@ -347,49 +347,6 @@
 (defun formulas-w/o-includes (tptp-db)
   (remove-if #'(lambda (x) (eql (type-of x) 'include-instruction)) (formulas tptp-db)))
 
-(defgeneric supporting-axioms (tptp))
-
-(defgeneric exists-path (from to thing))
-
-(defmethod exists-path (from to (db tptp-db))
-  (exists-path from to (dependency-table db)))
-
-(defmethod exists-path (from (to integer) thing)
-  (exists-path from (format nil "~a" to) thing))
-
-(defmethod exists-path ((from integer) to thing)
-  (exists-path (format nil "~a" from) to thing))
-
-(defmethod exists-path (from (to symbol) thing)
-  (exists-path from (symbol-name to) thing))
-
-(defmethod exists-path ((from symbol) to thing)
-  (exists-path (symbol-name from) to thing))
-
-(defmethod exists-path ((from string) (to string) (table hash-table))
-  (if (string= from to)
-      (list from)
-      (loop
-	 :with predecessors = (gethash from table)
-	 :for pred :in predecessors
-	 :for path = (exists-path pred to table)
-	 :when path :do (return (cons from path))
-	 :finally (return nil))))
-
-(defmethod supporting-axioms ((x inference-record))
-  (let ((parents (parents x)))
-    (when parents
-      (supporting-axioms parents))))
-
-(defmethod supporting-axioms ((x general-list))
-  (reduce #'append (mapcar #'supporting-axioms (terms x))))
-
-(defmethod supporting-axioms ((x string))
-  (list x))
-
-(defmethod supporting-axioms ((x integer))
-  (list (format nil "~d" x)))
-
 (defgeneric axioms (tptp))
 
 (defmethod axioms ((db tptp-db))
@@ -409,35 +366,6 @@
 	      (t
 	       (error "Don't know how to determine whether '~a' is an axiom." formula))))
       t))
-
-(defmethod supporting-axioms ((db tptp-db))
-  (let ((support-table (make-hash-table :test #'equal)))
-    (dolist (formula (formulas db))
-      (let ((name (stringify (name formula))))
-	(if (slot-boundp formula 'source)
-	    (setf (gethash name support-table)
-		  (supporting-axioms (source formula)))
-	    (setf (gethash name support-table) nil))))
-    (flet ((axiom-p (name) (null (gethash name support-table))))
-      (let ((keys (hash-table-keys support-table)))
-	(let ((axioms (remove-if-not #'axiom-p keys))
-	      (non-axioms (remove-if #'axiom-p keys)))
-	  (let ((full-table (make-hash-table :test #'equal)))
-	    (dolist (axiom axioms)
-	      (setf (gethash axiom full-table) nil))
-	    (dolist (non-axiom non-axioms)
-	      (flet ((supports (axiom)
-		       (exists-path non-axiom axiom support-table)))
-		(setf (gethash non-axiom full-table)
-		      (remove-if-not #'supports axioms))))
-	    (flet ((update-formula (formula)
-		     (setf (optional-info formula)
-		     (make-instance 'general-list
-				    :terms (gethash (stringify (name formula))
-						    full-table)))))
-	      (dolist (formula (formulas db))
-		(update-formula formula))))))))
-  db)
 
 (defgeneric easily-equivalent (formula-1 formula-2 background-premises)
   (:documentation "Can we quickly prove that FORMULA-1 and FORMULA-2
