@@ -367,26 +367,6 @@
 (defun formulas-w/o-includes (tptp-db)
   (remove-if #'(lambda (x) (eql (type-of x) 'include-instruction)) (formulas tptp-db)))
 
-(defgeneric axioms (tptp))
-
-(defmethod axioms ((db tptp-db))
-  (remove-if-not #'axiom-p (formulas db)))
-
-(defgeneric axiom-p (formula))
-
-(defmethod axiom-p ((formula tptp-formula))
-  (if (slot-boundp formula 'source)
-      (let ((source (source formula)))
-	(cond ((typep source 'internal-source)
-	       nil)
-	      ((typep source 'general-list)
-	       (null (terms source)))
-	      ((integerp source)
-	       nil)
-	      (t
-	       (error "Don't know how to determine whether '~a' is an axiom." formula))))
-      t))
-
 (defgeneric fofify (tptp))
 
 (defmethod fofify ((l list))
