@@ -63,21 +63,6 @@
   (format stream "fof")
   (call-next-method))
 
-(defgeneric render (tptp-thing)
-  (:documentation "A plain text rendering of TPTP-THING."))
-
-(defmethod render ((formula fof))
-  (format nil "fof(~a,~a,~a)."
-	  (name formula)
-	  (role formula)
-	  (formula formula)))
-
-(defmethod render ((formula cnf))
-  (format nil "cnf(~a,~a,~a)."
-	  (name formula)
-	  (role formula)
-	  (formula formula)))
-
 (defgeneric make-tptp-formula (thing))
 
 (defmethod make-tptp-formula ((thing list))
@@ -154,11 +139,6 @@
     (if selection
 	(format stream "include(~a,[~{~a~^,~}])." file selection)
 	(format stream "include(~a)." file))))
-
-(defmethod render ((include include-instruction))
-  (with-slots (file selection)
-      include
-    (format nil "include(~a,[~{~a~^,~}])." file selection)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expanding includes

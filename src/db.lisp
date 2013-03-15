@@ -25,14 +25,6 @@
     (when (pathnamep path)
       (directory-namestring path))))
 
-(defmethod render ((formulas list))
-  (if formulas
-      (format nil "~{~a~%~}" (mapcar #'render formulas))
-      (format nil "(empty formula list)")))
-
-(defmethod render ((problem tptp-db))
-  (render (formulas problem)))
-
 (defgeneric proper-formulas (problem))
 
 (defmethod proper-formulas ((problem tptp-db))
