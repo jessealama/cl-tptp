@@ -14,4 +14,8 @@
 		#:file-exists-p
 		#:list-directory)
   (:import-from #:alexandria
-		#:length=))
+		#:length=)
+
+  (:export #:tptp-problem-sections
+	   #:tptp-problems-in-section
+	   #:parse-released-tptp))
