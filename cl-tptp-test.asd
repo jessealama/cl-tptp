@@ -7,4 +7,5 @@
   :depends-on (:lisp-unit :cl-tptp)
   :serial t
   :components ((:file "test/package")
-	       (:file "test/00")))
+	       (:file "test/00")
+	       (:file "test/tptp-library")))
