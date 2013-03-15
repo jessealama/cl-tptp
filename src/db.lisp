@@ -683,27 +683,6 @@
 					     (formula-with-name tptp name))
 					 sorted-supporting))))))
 
-(defgeneric formulas-independent-of (db formula)
-  (:documentation "The formulas of DB that cannot be traced back to
-  FORMULA as a premise."))
-
-(defmethod formulas-independent-of ((db tptp-db) (formula tptp-formula))
-  (formulas-independent-of db (stringify (name formula))))
-
-(defmethod formulas-independent-of ((db tptp-db) (formula symbol))
-  (formulas-independent-of db (symbol-name formula)))
-
-(defmethod formulas-independent-of ((db tptp-db) (formula integer))
-  (formulas-independent-of db (format nil "~d" formula)))
-
-(defmethod formulas-independent-of ((db tptp-db) (formula string))
-  (let ((dep-table (dependency-table db)))
-    (remove-if-not #'(lambda (x)
-		       (not (exists-path (stringify (name x))
-					 formula
-					 dep-table)))
-		   (formulas db))))
-
 (defmethod universally-close :around ((x tptp-formula))
   (let ((new-formula (call-next-method)))
     (when (slot-boundp x 'source)
