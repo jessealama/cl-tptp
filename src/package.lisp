@@ -9,7 +9,9 @@
 		#:in-readtable)
   (:import-from #:cl-fad
 		#:pathname-as-directory
+		#:pathname-as-file
 		#:directory-exists-p
-		#:file-exists-p)
+		#:file-exists-p
+		#:list-directory)
   (:import-from #:alexandria
 		#:length=))
