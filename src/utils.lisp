@@ -4,6 +4,9 @@
 (defun stringify (x)
   (format nil "~a" x))
 
+(defun hash-table-keys (table)
+  (loop for k being the hash-keys in table collect k))
+
 (defgeneric symbolify-here (thing))
 
 (defmethod symbolify-here ((thing symbol))
