@@ -95,12 +95,6 @@
 (defmethod render ((problem tptp-db))
   (render (formulas problem)))
 
-(defmethod kowalski ((l null))
-  nil)
-
-(defmethod kowalski ((l list))
-  (mapcar #'kowalski l))
-
 (defmethod render ((problem derivability-problem))
   (with-output-to-string (s)
     (dolist (formula (formulas problem))
@@ -356,11 +350,6 @@
 
 (defmethod simplify-justification ((include include-instruction))
   include)
-
-(defmethod kowalski ((db tptp-db))
-  (make-instance 'tptp-db
-		 :path (path db)
-		 :formulas (mapcar #'kowalski (formulas db))))
 
 (defmethod squeeze-quantifiers ((db tptp-db))
   (make-instance 'tptp-db

@@ -845,29 +845,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 (defmethod flatten-tptp ((l general-list))
   (flatten-tptp (terms l)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Kowalski form for clauses
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defgeneric kowalski (formula))
-
-(defmethod kowalski ((x generalization))
-  (make-instance (class-of x)
-		 :bindings (bindings x)
-		 :matrix (kowalski (matrix x))))
-
-(defmethod kowalski ((x binary-connective-formula))
-  (make-instance (class-of x)
-		 :lhs (kowalski (lhs x))
-		 :rhs (kowalski (rhs x))))
-
-(defmethod kowalski ((x atomic-formula))
-  x)
-
-(defmethod kowalski ((x negation))
-  (make-instance 'negation
-		 :argument (kowalski (argument x))))
-
 (defgeneric negative-formula-p (formula))
 
 (defmethod negative-formula-p ((formula t))
@@ -891,46 +868,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
   (make-instance 'equation
 		 :lhs (lhs eq)
 		 :rhs (rhs eq)))
-
-(defmethod kowalski ((x multiple-arity-disjunction))
-  (let ((disjuncts (disjuncts x)))
-    (setf disjuncts (remove-if #'(lambda (x) (and (typep x 'atomic-formula)
-						  (length= 0 (arguments x))
-						  (string= (stringify (predicate x))
-							   "false")))
-			       disjuncts))
-    (let ((negated-disjuncts (remove-if-not #'negative-formula-p disjuncts))
-	  (non-negated-disjuncts (remove-if #'negative-formula-p disjuncts)))
-      (if negated-disjuncts
-	  (if non-negated-disjuncts
-	      (kowalski (make-implication (apply #'make-multiple-arity-conjunction negated-disjuncts)
-					  (apply #'make-multiple-arity-disjunction non-negated-disjuncts)))
-	      (kowalski (make-implication (apply #'make-multiple-arity-conjunction negated-disjuncts)
-					  *nullary-false*)))
-	  (apply #'make-multiple-arity-disjunction
-		 (mapcar #'kowalski non-negated-disjuncts))))))
-
-(defmethod kowalski ((x multiple-arity-conjunction))
-  (make-instance 'multiple-arity-conjunction
-		 :items (mapcar #'kowalski (items x))))
-
-(defmethod kowalski ((x binary-disjunction))
-  (let ((disjuncts (disjuncts x)))
-    (setf disjuncts (remove-if #'(lambda (x) (and (typep x 'atomic-formula)
-						  (length= 0 (arguments x))
-						  (string= (stringify (predicate x))
-							   "false")))
-			       disjuncts))
-    (let ((negated-disjuncts (remove-if-not #'negative-formula-p disjuncts))
-	  (non-negated-disjuncts (remove-if #'negative-formula-p disjuncts)))
-      (if negated-disjuncts
-	  (if non-negated-disjuncts
-	      (kowalski (make-implication (apply #'make-multiple-arity-conjunction (mapcar #'positivize negated-disjuncts))
-					  (apply #'make-multiple-arity-disjunction non-negated-disjuncts)))
-	      (kowalski (make-implication (apply #'make-multiple-arity-conjunction (mapcar #'positivize negated-disjuncts))
-					  *nullary-false*)))
-	  (apply #'make-multiple-arity-disjunction
-		 (mapcar #'kowalski non-negated-disjuncts))))))
 
 (defun same-variable-name (variable-1 variable-2)
   (string= (stringify (head variable-1))

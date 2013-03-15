@@ -200,22 +200,6 @@
 	   finally
 	     (return (reverse new-formulas)))))))
 
-(defmethod kowalski :around ((formula tptp-formula))
-  (let ((new-formula (call-next-method)))
-    (when (slot-boundp formula 'source)
-      (setf (source new-formula)
-	    (source formula)))
-    (when (slot-boundp formula 'optional-info)
-      (setf (optional-info new-formula)
-	    (optional-info formula)))
-    new-formula))
-
-(defmethod kowalski ((formula tptp-formula))
-  (make-instance (class-of formula)
-		 :name (name formula)
-		 :role (role formula)
-		 :formula (kowalski (formula formula))))
-
 (defmethod squeeze-quantifiers :around ((formula tptp-formula))
   (let ((new-formula (call-next-method)))
     (when (slot-boundp formula 'source)
