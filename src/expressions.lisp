@@ -63,19 +63,6 @@
   (typep thing 'variable-term))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Operators
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defparameter *all-symbol* (symbolify-here "all"))
-(defparameter *exists-symbol* (symbolify-here "exists"))
-(defparameter *or-symbol* (symbolify-here "or"))
-(defparameter *and-symbol* (symbolify-here "and"))
-(defparameter *negation-symbol* (symbolify-here "not"))
-(defparameter *implication-symbol* (symbolify-here "implies"))
-(defparameter *equivalence-symbol* (symbolify-here "iff"))
-(defparameter *nonequivalence-symbol* (symbolify-here "xor"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Formulas
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
