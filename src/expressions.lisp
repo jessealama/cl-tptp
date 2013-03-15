@@ -237,15 +237,6 @@
 
 (defgeneric make-atomic-formula (predicate &rest arguments))
 
-(defmethod make-atomic-formula ((predicate symbol) &rest arguments)
-  (make-instance 'atomic-formula
-		 :predicate predicate
-		 :arguments (mapcar #'form->term arguments)))
-
-(defparameter contradiction (make-atomic-formula 'bottom))
-
-(defparameter top (make-atomic-formula 'top))
-
 (defun make-equation (lhs rhs)
   (make-atomic-formula '= lhs rhs))
 
@@ -303,25 +294,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
   ((items :initarg :items
 	  :accessor items
 	  :type list)))
-
-(defgeneric connective-unit (multiple-arity-connective-formula))
-
-(defmethod print-object :around ((formula multiple-arity-connective-formula)
-				 stream)
-  (let ((items (items formula)))
-    (if (null items)
-	(format stream "~A" (connective-unit formula))
-	(if (null (cdr items))
-	    (format stream "~A" (car items))
-	    (progn
-	      (format stream "(")
-	      (format stream "~A" (car items))
-	      (loop for item in (cdr items)
-		   do
-		   (format stream " ")
-		   (call-next-method)
-		   (format stream " ~A" item))
-	      (format stream ")"))))))
 
 (defun implication? (thing)
   (typep thing 'implication))
@@ -404,10 +376,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 (defmethod disjuncts ((x multiple-arity-disjunction))
   (reduce #'append (mapcar #'disjuncts (items x))))
 
-(defmethod connective-unit ((mad multiple-arity-disjunction))
-  (declare (ignore mad))
-  top)
-
 (defun multiple-arity-disjunction? (thing)
   (eql (class-of thing) 'multiple-arity-disjunction))
 
@@ -484,10 +452,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 
 (defmethod conjuncts ((x multiple-arity-conjunction))
   (conjuncts (items x)))
-
-(defmethod connective-unit ((mac multiple-arity-conjunction))
-  (declare (ignore mac))
-  contradiction)
 
 (defun multiple-arity-conjunction? (thing)
   (eql (class-of thing) 'multiple-arity-conjunction))
