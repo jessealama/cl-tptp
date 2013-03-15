@@ -531,22 +531,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 			   "The given text,~%~%  ~A,~%~%is an atomic formula."
 			   text))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Shortcuts
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defmacro -> (antecdent consequent)
-  `(make-implication ,antecdent ,consequent))
-
-(defmacro & (lhs rhs)
-  `(make-binary-conjunction ,lhs ,rhs))
-
-(defmacro v (lhs rhs)
-  `(make-binary-disjunction ,lhs ,rhs))
-
-(defmacro neg (argument)
-  `(negate ,argument))
-
 (defclass tptp-source ()
   nil)
 
