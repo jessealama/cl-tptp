@@ -628,18 +628,6 @@
 (defmethod terms-with-functor (functor-name (x tptp-formula))
   (terms-with-functor functor-name (formula x)))
 
-(defgeneric dependency-table (tptp)
-  (:documentation "A hash table whose keys are strings naming formulas of TPTP and whose values for a key X is the list of one-step dependencies of X."))
-
-(defmethod dependency-table ((db tptp-db))
-  (loop
-     :with dep-table = (make-hash-table :test #'equal)
-     :for formula :in (formulas db)
-     :for name = (stringify (name formula))
-     :for premises = (premises formula)
-     :do (setf (gethash name dep-table) (mapcar #'stringify premises))
-     :finally (return dep-table)))
-
 (defmethod universally-close :around ((x tptp-formula))
   (let ((new-formula (call-next-method)))
     (when (slot-boundp x 'source)
