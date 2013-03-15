@@ -25,11 +25,6 @@
     (when (pathnamep path)
       (directory-namestring path))))
 
-(defgeneric proper-formulas (problem))
-
-(defmethod proper-formulas ((problem tptp-db))
-  (mapcar #'formula (formulas problem)))
-
 (defgeneric conjecture-formula (thing)
   (:documentation "The conjecture formula in THING."))
 
