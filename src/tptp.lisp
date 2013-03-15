@@ -200,28 +200,6 @@
 	   finally
 	     (return (reverse new-formulas)))))))
 
-(defmethod squeeze-quantifiers :around ((formula tptp-formula))
-  (let ((new-formula (call-next-method)))
-    (when (slot-boundp formula 'source)
-      (setf (source new-formula)
-	    (source formula)))
-    (when (slot-boundp formula 'optional-info)
-      (setf (optional-info new-formula)
-	    (optional-info formula)))
-    new-formula))
-
-(defmethod squeeze-quantifiers ((formula tptp-formula))
-  (make-instance (class-of formula)
-		 :name (name formula)
-		 :role (role formula)
-		 :formula (squeeze-quantifiers (formula formula))))
-
-(defmethod squeeze-quantifiers ((l list))
-  (mapcar #'squeeze-quantifiers l))
-
-(defmethod squeeze-quantifiers ((x null))
-  nil)
-
 (defun tptp-directory ()
   (let ((env (getenv "TPTP")))
     (when env

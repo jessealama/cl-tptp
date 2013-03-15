@@ -351,11 +351,6 @@
 (defmethod simplify-justification ((include include-instruction))
   include)
 
-(defmethod squeeze-quantifiers ((db tptp-db))
-  (make-instance 'tptp-db
-		 :path (path db)
-		 :formulas (mapcar #'squeeze-quantifiers (formulas db))))
-
 (defmethod fofify ((db tptp-db))
   (make-instance 'tptp-db
 		 :path (path db)

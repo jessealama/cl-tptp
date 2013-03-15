@@ -328,33 +328,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 
 (defgeneric connective-unit (multiple-arity-connective-formula))
 
-(defgeneric squeeze-quantifiers (generalization))
-
-(defmethod squeeze-quantifiers ((x atomic-formula))
-  x)
-
-(defmethod squeeze-quantifiers ((x negation))
-  (make-instance 'negation
-		 :argument (squeeze-quantifiers (argument x))))
-
-(defmethod squeeze-quantifiers ((x binary-connective-formula))
-  (make-instance (class-of x)
-		 :lhs (squeeze-quantifiers (lhs x))
-		 :rhs (squeeze-quantifiers (rhs x))))
-
-(defmethod squeeze-quantifiers ((x multiple-arity-connective-formula))
-  (make-instance (class-of x)
-		 :items (mapcar #'squeeze-quantifiers (items x))))
-
-(defmethod squeeze-quantifiers ((x generalization))
-  (if (eql (class-of x)
-	   (class-of (matrix x)))
-      (squeeze-quantifiers (make-instance (class-of x)
-					  :bindings (append (bindings x)
-							    (bindings (matrix x)))
-					  :matrix (matrix (matrix x))))
-      x))
-
 (defmethod print-object :around ((formula multiple-arity-connective-formula)
 				 stream)
   (let ((items (items formula)))
