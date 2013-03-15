@@ -538,9 +538,3 @@
 		 :name (name x)
 		 :role (role x)
 		 :formula (negate (formula x))))
-
-(defgeneric definition-p (x)
-  (:documentation "Is X a definition?"))
-
-(defmethod definition-p ((x tptp-formula))
-  (string= (role x) "definition"))
