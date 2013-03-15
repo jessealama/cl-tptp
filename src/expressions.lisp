@@ -506,18 +506,6 @@ class ATOMIC-FORMULA.  This function expresses that disjointedness."
 		 :bindings bindings
 		 :matrix matrix))
 
-(define-condition non-atomic-formula-error (error)
-  ((text :initarg :text
-	 :reader non-atomic-formula-error-text))
-  (:report (lambda (condition stream)
-	     (let ((text (non-atomic-formula-error-text condition)))
-	       (if (null text)
-		   (format stream
-			   "Weird: no text was given (or text is simply NIL)")
-		   (format stream
-			   "The given text,~%~%  ~A,~%~%is an atomic formula."
-			   text))))))
-
 (defclass tptp-source ()
   nil)
 
