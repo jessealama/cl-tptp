@@ -446,9 +446,6 @@
 		 :role (role x)
 		 :formula (universally-close (formula x))))
 
-(defmethod contains-predicate? ((x tptp-formula) predicate)
-  (contains-predicate? (formula x) predicate))
-
 (defmethod atomic-formula-p ((x tptp-formula))
   (atomic-formula-p (formula x)))
 
