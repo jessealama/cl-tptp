@@ -905,6 +905,10 @@
        collect token into tokens
        unless token return tokens)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Parsing named (released) TPTP problems
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defgeneric parse-released-tptp (problem &key tptp-directory)
   (:documentation "Parse PROBLEM, considered as a released TPTP problem."))
 
@@ -922,12 +926,13 @@
 
 (defmethod parse-released-tptp ((problem string) &key tptp-directory)
   (unless tptp-directory
-    (setf tptp-directory (getenv "TPTP")))
+    (setf tptp-directory (tptp-directory)))
   (when (null tptp-directory)
     (error "No TPTP-DIRECTORY supplied, and the TPTP environment variable appears to be unset."))
   (when (stringp tptp-directory)
     (setf tptp-directory (pathname tptp-directory)))
-  (setf tptp-directory (pathname-as-directory tptp-directory))
+  (when (pathnamep tptp-directory)
+    (setf tptp-directory (pathname-as-directory tptp-directory)))
   (unless (directory-exists-p tptp-directory)
     (error "No such directory '~a'." (namestring tptp-directory)))
   (let ((problems-subdir (merge-pathnames "Problems/" tptp-directory)))
