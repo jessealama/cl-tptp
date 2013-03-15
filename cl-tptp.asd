@@ -10,5 +10,4 @@
 	       (:file "src/utils")
 	       (:file "src/expressions")
 	       (:file "src/tptp")
-	       (:file "src/db")
 	       (:file "src/parse")))
