@@ -25,59 +25,6 @@
     (when (pathnamep path)
       (directory-namestring path))))
 
-(defclass derivability-problem (tptp-db)
-  ((conjecture
-    :initarg :conjecture
-    :accessor conjecture
-    :initform (error "To specify a derivability problem, a conjecture must be supplied."))))
-
-(defmethod print-object ((problem derivability-problem) stream)
-  (let ((conjecture (conjecture problem))
-	(formulas (formulas problem)))
-    (format stream "~a" conjecture)
-    (when formulas
-      (terpri stream)
-      (format stream "~{~a~^~%~}" formulas))))
-
-(defmethod initialize-instance :after ((problem derivability-problem) &rest initargs &key &allow-other-keys)
-  (declare (ignore initargs))
-  (when (conjecture-formula (premises problem))
-    (error "Some non-conjecture formula has the TPTP status 'conjecture'."))
-  (loop
-     :initially (setf (role (conjecture problem)) "conjecture")
-     :for formula in (formulas problem)
-     :for role = (role formula)
-     :unless (string= role "conjecture") :do (setf (role formula) "axiom")
-     :finally (return problem)))
-
-(defgeneric make-derivability-problem (formulas))
-
-(defmethod make-derivability-problem ((formulas tptp-db))
-  (let ((conjecture (conjecture-formula formulas)))
-    (if conjecture
-	(make-instance 'derivability-problem
-		       :formulas (non-conjecture-formulas formulas)
-		       :conjecture conjecture
-		       :path (path formulas))
-	(error "There is no conjecture formula in ~a." formulas))))
-
-(defmethod make-derivability-problem ((formulas null))
-  (error "The empty list does not contain a conjecture formula."))
-
-(defmethod make-derivability-problem ((formulas list))
-  (let ((conjecture (find "conjecture" formulas :test #'string= :key #'role))
-	(non-conjecture-formulas (remove-if #'(lambda (formula)
-						(string= (role formula) "conjecture"))
-					    formulas)))
-    (if conjecture
-	(make-instance 'derivability-problem
-		       :formulas non-conjecture-formulas
-		       :conjecture conjecture)
-	(error "No conjecture formula found in ~{~a~%~}" formulas))))
-
-(defmethod make-derivability-problem ((problem pathname))
-  (make-derivability-problem (parse-tptp problem)))
-
 (defmethod render ((formulas list))
   (if formulas
       (format nil "~{~a~%~}" (mapcar #'render formulas))
@@ -85,14 +32,6 @@
 
 (defmethod render ((problem tptp-db))
   (render (formulas problem)))
-
-(defmethod render ((problem derivability-problem))
-  (with-output-to-string (s)
-    (dolist (formula (formulas problem))
-      (format s "~a" (render formula))
-      (terpri s))
-    (format s "~a" (render (conjecture problem)))
-    (terpri s)))
 
 (defgeneric proper-formulas (problem))
 
@@ -128,18 +67,6 @@
 				   (formulas formulas)
 				   :test #'string=
 				   :key #'name)))
-
-;; (defmethod remove-formula ((problem derivability-problem) (formula tptp-formula))
-;;   (let ((name-to-remove (name formula))
-;; 	(conjecture-name (name (conjecture problem))))
-;;     (if (string= name-to-remove conjecture-name)
-;; 	(make-instance 'tptp-db
-;; 		       :formulas (formulas problem))
-;; 	(make-instance 'derivability-problem
-;; 		       :conjecture (conjecture problem)
-;; 		       :formulas (remove-if #'(lambda (x) (string= x name-to-remove))
-;; 					    (formulas problem)
-;; 					    :key #'name)))))
 
 (defmethod remove-formula ((formulas tptp-db) (formula tptp-formula))
   (remove-formula formulas (name formula)))
@@ -202,26 +129,6 @@
 			   :formulas (cons new-formula
 					   other-formulas)))))))
 
-(defmethod change-status-of-formula-in ((formula string)
-					(problem derivability-problem)
-					(new-status string))
-  (if (string= new-status "conjecture")
-      (let ((conjecture (conjecture problem)))
-	(let ((conjecture-name (name conjecture)))
-	  (if (string= conjecture-name formula)
-	      problem
-	      (error "The given derivability-problem already has a conjecture formula; (by the name ~a), so we cannot change the status of ~a into 'conjecture'." conjecture-name formula))))
-      (let ((formula-in-problem (formula-with-name problem formula)))
-    (if formula-in-problem
-	(let ((other-formulas (remove-if #'(lambda (name)
-					     (string= name formula))
-					 (formulas problem)
-					 :key #'name)))
-	  (let ((new-formula (change-status formula-in-problem new-status)))
-	    (make-instance 'tptp-db
-			   :formulas (cons new-formula
-					   other-formulas))))))))
-
 (defun promote-conjecture-to-axiom (problem)
   (let ((conjecture (has-conjecture-p problem)))
     (if conjecture
@@ -271,27 +178,6 @@
 	    (t
 	     (error "Don't know how to handle ~a." formula))))
     (make-instance 'tptp-db
-		   :formulas new-formulas)))
-
-(defmethod restrict-to ((problem derivability-problem) (formulas list))
-  (let* ((new-formulas nil)
-	 (conjecture (conjecture problem))
-	 (conjecture-name (name conjecture)))
-    (dolist (formula formulas)
-      (cond ((stringp formula)
-	     (let ((formula-in-db (formula-with-name problem formula)))
-	       (when formula-in-db
-		 (unless (string= formula conjecture-name)
-		   (push formula-in-db new-formulas)))))
-	    ((typep formula 'formula)
-	     (let ((formula-in-db (formula-with-name problem (name formula))))
-	       (when formula-in-db
-		 (unless (string= (name formula) conjecture-name)
-		   (push formula-in-db new-formulas)))))
-	    (t
-	     (error "Don't know how to handle ~a." formula))))
-    (make-instance 'derivability-problem
-		   :conjecture conjecture
 		   :formulas new-formulas)))
 
 (defmethod fofify ((db tptp-db))
