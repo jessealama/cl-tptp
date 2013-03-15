@@ -424,50 +424,6 @@
 	:key #'(lambda (x) (stringify (name x)))
 	:test #'string=))
 
-(defgeneric strip-optional-info (tptp-thing))
-
-(defmethod strip-optional-info ((x null))
-  nil)
-
-(defmethod strip-optional-info ((l list))
-  (mapcar #'strip-optional-info l))
-
-(defmethod strip-optional-info ((db tptp-db))
-  (make-instance 'tptp-db
-		 :formulas (mapcar #'strip-optional-info (formulas db))))
-
-(defmethod strip-optional-info :around ((x tptp-formula))
-  (let ((new-formula (call-next-method)))
-    (when (slot-boundp x 'source)
-      (setf (source new-formula)
-	    (source x)))
-    new-formula))
-
-(defmethod strip-optional-info ((x tptp-formula))
-  (make-instance (class-of x)
-		 :name (name x)
-		 :role (role x)
-		 :formula (formula x)))
-
-
-(defgeneric strip-source (tptp-thing))
-
-(defmethod strip-source ((x null))
-  nil)
-
-(defmethod strip-source ((l list))
-  (mapcar #'strip-source l))
-
-(defmethod strip-source ((db tptp-db))
-  (make-instance 'tptp-db
-		 :formulas (mapcar #'strip-source (formulas db))))
-
-(defmethod strip-source ((x tptp-formula))
-  (make-instance (class-of x)
-		 :name (name x)
-		 :role (role x)
-		 :formula (formula x)))
-
 (defmethod flatten-conjunctions/disjunctions ((x null))
   nil)
 
