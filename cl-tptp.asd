@@ -11,5 +11,4 @@
 	       (:file "src/expressions")
 	       (:file "src/tptp")
 	       (:file "src/db")
-	       (:file "src/parse")
-	       (:file "src/html")))
+	       (:file "src/parse")))
